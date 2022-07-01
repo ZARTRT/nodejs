@@ -97,15 +97,15 @@ Addons：这也是c++的部分
 >
 > 创建Buffer
 >
-> <img src="/Users/zhangjian/Documents/gitHub/node/node.assets/image-20220701114627266.png" alt="image-20220701114627266" style="zoom: 33%;" align="left"/>
+> <img src="node.assets/image-20220701114627266.png" alt="image-20220701114627266" style="zoom: 33%;" align="left"/>
 >
 > 创建Buffer的坑
 >
-> <img src="/Users/zhangjian/Documents/gitHub/node/node.assets/image-20220701114733204.png" alt="image-20220701114733204" style="zoom: 33%;" align="left"/>
+> <img src="node.assets/image-20220701114733204.png" alt="image-20220701114733204" style="zoom: 33%;" align="left"/>
 >
 > 使用Buffer
 >
-> <img src="/Users/zhangjian/Documents/gitHub/node/node.assets/image-20220701114846772.png" alt="image-20220701114846772" style="zoom:33%;" align="left"/>
+> <img src="node.assets/image-20220701114846772.png" alt="image-20220701114846772" style="zoom:33%;" align="left"/>
 
 ###### 2.2 Stream
 
