@@ -67,7 +67,9 @@ node虽然无所不能，但也有其不适合的事情，比如计算量比较�
 
 ##### 1. Nodejs架构
 
-<img src="README.assets/image-20220701102950528.png" alt="image-20220701102950528" style="zoom: 50%;" align="left"/>
+<div align="left">
+  <img src="README.assets/image-20220701102950528.png" alt="image-20220701102950528" width="850"/>
+</div>
 
 v8引擎：谷歌开源c++实现的高性能js引擎，v8会将你的代码编译为机器码（我理解为0和1），它跑在JS引擎线程里
 
@@ -93,7 +95,9 @@ Addons：这也是c++的部分
 >
 > Buffer其实可以理解为一个小区块，帮助我们来存临时的东西、缓冲数据，真实的使用场景实在流（stream）当中去使用
 >
-> <img src="README.assets/image-20220701112722309.png" alt="image-20220701112722309" style="zoom: 33%;" align="left"/>
+> <div align="left">
+>   <img src="README.assets/image-20220701112722309.png" alt="image-20220701112722309" width="750"/>
+> </div>
 >
 > 
 >
@@ -102,10 +106,10 @@ Addons：这也是c++的部分
 >   ```
 >   Buffer.from(bufferlarraylstring) 使用堆外内存新增Buffer
 >   Buffer.from(arrayBuffer） 浅拷贝arrayBuffer，共享内存
->     
+>   
 >   Buffer.alloc(size)分配一个指定大小的Buffer，默认填0，使用UTF-8编码
 >   Buffer.allocUnsafe(size) 分配一 个未初始化的Buffer
->     
+>   
 >   流式数据会自动创建Buffer，手动创建Buffer需谨慎
 >   ```
 >
@@ -116,12 +120,12 @@ Addons：这也是c++的部分
 >   ```
 >   预分配一个内部的大小为 Buffer.poolSize(8K) 的Buffer 实例，作为快速分配的内存池
 >   如果allocUnsafe/from(array）的size小于4K，则从预分配的池子中分配
->     
+>   
 >   绕开V8回收机制，使用专用回收机制，提高性能和内存使用效率
 >   但这种玩法会导致未初始化的数据块投入使用，造成数据泄露风险
 >   ```
 >
->   
+> 
 >
 > - 使用Buffer
 >
@@ -129,11 +133,11 @@ Addons：这也是c++的部分
 >   转换格式
 >   - 字符串：编码Buffer.from(string)，解码buf.toString()
 >   - JSON：buf.toJSON()
->     
+>   
 >   剪裁和拼接
 >   - 剪裁：Buffer.slice()表现与Array.slice()不同，返回Buffer与原buf共享内存
 >   - 拼接：buf.copy/buf.concat 返回新的Buffer
->     
+>   
 >   比较和遍历索引
 >   - 判断相等：bufl.equals(buf2)比较的是二进制的值
 >   - 索引：使用buftindex形式进行索引，for.of/indexOf/includes等Array方法也可以使用
@@ -141,11 +145,11 @@ Addons：这也是c++的部分
 
 ###### 2.2 Stream
 
-> <img src="README.assets/image-20220701113836933.png" alt="image-20220701113836933" style="zoom: 33%;" align="left"/>
+> <div><img src="README.assets/image-20220701113836933.png" alt="image-20220701113836933" width="750"/></div>
 
 ###### 2.3 event/EventEmitter
 
-> <img src="README.assets/image-20220701114033902.png" alt="image-20220701114033902" style="zoom: 33%;" align="left"/>
+> <div><img src="README.assets/image-20220701114033902.png" alt="image-20220701114033902" width="750"/></div>
 
 ###### 2.4 Error
 
@@ -309,7 +313,11 @@ node如何加载、执行这些文件模块的？
 >
 > 文件定位会经历以下过程，如图所示：
 >
-> <img src="README.assets/image-20220705161352007.png" alt="image-20220705161352007"  width="750" align="left"/>
+> <div align="left">
+>   <img src="README.assets/image-20220705161352007.png" alt="image-20220705161352007"  width="750"/>
+> </div>
+>
+> 
 >
 > 
 >
