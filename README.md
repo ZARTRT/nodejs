@@ -67,7 +67,7 @@ node虽然无所不能，但也有其不适合的事情，比如计算量比较�
 
 ##### 1. Nodejs架构
 
-<img src="node.assets/image-20220701102950528.png" alt="image-20220701102950528" style="zoom: 50%;" align="left"/>
+<img src="README.assets/image-20220701102950528.png" alt="image-20220701102950528" style="zoom: 50%;" align="left"/>
 
 v8引擎：谷歌开源c++实现的高性能js引擎，v8会将你的代码编译为机器码（我理解为0和1），它跑在JS引擎线程里
 
@@ -93,7 +93,7 @@ Addons：这也是c++的部分
 >
 > Buffer其实可以理解为一个小区块，帮助我们来存临时的东西、缓冲数据，真实的使用场景实在流（stream）当中去使用
 >
-> <img src="node.assets/image-20220701112722309.png" alt="image-20220701112722309" style="zoom: 33%;" align="left"/>
+> <img src="README.assets/image-20220701112722309.png" alt="image-20220701112722309" style="zoom: 33%;" align="left"/>
 >
 > 
 >
@@ -102,10 +102,10 @@ Addons：这也是c++的部分
 >   ```
 >   Buffer.from(bufferlarraylstring) 使用堆外内存新增Buffer
 >   Buffer.from(arrayBuffer） 浅拷贝arrayBuffer，共享内存
->   
+>     
 >   Buffer.alloc(size)分配一个指定大小的Buffer，默认填0，使用UTF-8编码
 >   Buffer.allocUnsafe(size) 分配一 个未初始化的Buffer
->   
+>     
 >   流式数据会自动创建Buffer，手动创建Buffer需谨慎
 >   ```
 >
@@ -116,7 +116,7 @@ Addons：这也是c++的部分
 >   ```
 >   预分配一个内部的大小为 Buffer.poolSize(8K) 的Buffer 实例，作为快速分配的内存池
 >   如果allocUnsafe/from(array）的size小于4K，则从预分配的池子中分配
->   
+>     
 >   绕开V8回收机制，使用专用回收机制，提高性能和内存使用效率
 >   但这种玩法会导致未初始化的数据块投入使用，造成数据泄露风险
 >   ```
@@ -129,11 +129,11 @@ Addons：这也是c++的部分
 >   转换格式
 >   - 字符串：编码Buffer.from(string)，解码buf.toString()
 >   - JSON：buf.toJSON()
->   
+>     
 >   剪裁和拼接
 >   - 剪裁：Buffer.slice()表现与Array.slice()不同，返回Buffer与原buf共享内存
 >   - 拼接：buf.copy/buf.concat 返回新的Buffer
->   
+>     
 >   比较和遍历索引
 >   - 判断相等：bufl.equals(buf2)比较的是二进制的值
 >   - 索引：使用buftindex形式进行索引，for.of/indexOf/includes等Array方法也可以使用
@@ -141,11 +141,11 @@ Addons：这也是c++的部分
 
 ###### 2.2 Stream
 
-> <img src="node.assets/image-20220701113836933.png" alt="image-20220701113836933" style="zoom: 33%;" align="left"/>
+> <img src="README.assets/image-20220701113836933.png" alt="image-20220701113836933" style="zoom: 33%;" align="left"/>
 
 ###### 2.3 event/EventEmitter
 
-> <img src="node.assets/image-20220701114033902.png" alt="image-20220701114033902" style="zoom: 33%;" align="left"/>
+> <img src="README.assets/image-20220701114033902.png" alt="image-20220701114033902" style="zoom: 33%;" align="left"/>
 
 ###### 2.4 Error
 
@@ -266,3 +266,129 @@ Addons：这也是c++的部分
 > 操作文件
 >
 > - chmod/open/read/write
+
+#### 三、node原生API（下）
+
+这里介绍Nodejs的核心模块
+
+##### 1. Nodejs模块机制及原理
+
+node如何加载、执行这些文件模块的？
+
+模块引用：通过`require(module)`来引入`module`
+
+模块定义：通过挂载在`module.exports`对象上实现定义
+
+模块标识：通过路径标识引入的是哪个模块
+
+###### 1.1 在`node`中引入（require）一个模块会经历路径分析、文件定位、编译执行、加入缓存
+
+> **路径分析**
+>
+> 内置模块
+>
+> - 在Node进程开始的时候就预加载了
+>
+> - 加载的是二进制文件，无需定位和编译
+>
+> 文件模块
+>
+> - 通过NPM安装的第三方模块
+>
+> - 本地模块
+>
+> 模块内容
+>
+> - 函数、对象或者属性，如函数、数组甚至任意类型的JS对象
+>
+> 注意：优先级顺序，已缓存模块>内置模块>文件模块>文件目录模块>node_modules模块
+>
+> 
+>
+> **模块文件定位**
+>
+> 文件定位会经历以下过程，如图所示：
+>
+> <img src="README.assets/image-20220705161352007.png" alt="image-20220705161352007"  width="750" align="left"/>
+>
+> 
+>
+> **模块编译执行**
+> 		.js 文件：
+>
+> - 通过fs模块同步读取后编译执行，末识别类型也会当做js处理
+>
+> .json 文件：
+>
+> - 通过fs模块同步读取后，用`JSON.parse()`解析并返回结果
+>
+> .node 文件：
+>
+> - 这是用` C/C++`写的扩展文件，通过`process.dlopen()`方法加载最后编译生成的
+>
+> 
+>
+> **模块js文件的编译**
+>
+> 注入全局变量
+>
+> - 以参数形式，注入`module/exports/require`方法
+>
+> - 同时注入路径解析时得到的`__filename/__dirname`
+>
+> 构造上下文执行环境
+>
+> - 闭包产生作用域，通过 `runlnThisContext()`执行
+> - 将`function`对象挂载到`exports`对象上，并导出
+>
+> 
+>
+> **加入缓存以及清除缓存**
+>
+> 核心模块
+>
+> - 登记在`Native Module._ cache`上
+>
+> 文件模块
+>
+> - 封装后的方法以字符串形式存储，等待调用
+>
+> 清除缓存
+>
+> - 通过`delete require.cachelrequire.resolve(module]`
+
+###### 1.2 require vs import
+
+> import
+>
+> - ES6的规范
+>
+> - 静态加载模块
+>
+> - 编译的时候执行代码
+>
+> - 缓存执行结果
+>
+> - 按需引入，节省内存
+>
+> require
+>
+> - commonJS规范
+>
+> - 动态加载模块
+>
+> - 调用的时侯加载源码
+>
+> - 加载全部代码
+
+
+
+##### 2. Nodejs网络编程能力
+
+> node作为最流行的`Web Server`，原生到底提供了哪些能力来支持网络编程？
+
+
+
+##### 3. Nodejs进程管理能力
+
+> node是怎么管理这些js执行的？
