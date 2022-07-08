@@ -106,10 +106,10 @@ Addons：这也是c++的部分
 >   ```
 >   Buffer.from(bufferlarraylstring) 使用堆外内存新增Buffer
 >   Buffer.from(arrayBuffer） 浅拷贝arrayBuffer，共享内存
->   
+>     
 >   Buffer.alloc(size)分配一个指定大小的Buffer，默认填0，使用UTF-8编码
 >   Buffer.allocUnsafe(size) 分配一 个未初始化的Buffer
->   
+>     
 >   流式数据会自动创建Buffer，手动创建Buffer需谨慎
 >   ```
 >
@@ -120,7 +120,7 @@ Addons：这也是c++的部分
 >   ```
 >   预分配一个内部的大小为 Buffer.poolSize(8K) 的Buffer 实例，作为快速分配的内存池
 >   如果allocUnsafe/from(array）的size小于4K，则从预分配的池子中分配
->   
+>     
 >   绕开V8回收机制，使用专用回收机制，提高性能和内存使用效率
 >   但这种玩法会导致未初始化的数据块投入使用，造成数据泄露风险
 >   ```
@@ -133,11 +133,11 @@ Addons：这也是c++的部分
 >   转换格式
 >   - 字符串：编码Buffer.from(string)，解码buf.toString()
 >   - JSON：buf.toJSON()
->   
+>     
 >   剪裁和拼接
 >   - 剪裁：Buffer.slice()表现与Array.slice()不同，返回Buffer与原buf共享内存
 >   - 拼接：buf.copy/buf.concat 返回新的Buffer
->   
+>     
 >   比较和遍历索引
 >   - 判断相等：bufl.equals(buf2)比较的是二进制的值
 >   - 索引：使用buftindex形式进行索引，for.of/indexOf/includes等Array方法也可以使用
@@ -285,7 +285,9 @@ node如何加载、执行这些文件模块的？
 
 模块标识：通过路径标识引入的是哪个模块
 
-###### 1.1 在`node`中引入（require）一个模块会经历路径分析、文件定位、编译执行、加入缓存
+###### 1.1 在`node`中引入（require）
+
+require一个模块时，会经历路径分析、文件定位、编译执行、加入缓存这些过程
 
 > **路径分析**
 >
@@ -393,7 +395,33 @@ node如何加载、执行这些文件模块的？
 
 ##### 2. Nodejs网络编程能力
 
-> node作为最流行的`Web Server`，原生到底提供了哪些能力来支持网络编程？
+node作为最流行的`Web Server`，原生到底提供了哪些能力来支持网络编程？其实写web服务无非就是启动服务、编写可调用接口、将服务数据放至数据库
+
+###### 2.1 Socket
+
+> 理论来说：
+>
+> 实现底层通信，几乎所有的应用层都是通过`socket`进行通信的
+>
+> 对`TCP/IP`协议进行封装，向应用层协议暴露接口
+>
+> `TCP/IP `协议族中，传输层存在两种通用协议：`TCP`、`UDP`
+>
+> `TCP`、`UDP`两种协议不同，因为不同参数的`socket `实现过程也不一样
+>
+> 通俗来说：
+>
+> `Socket`是网络节点之间相互通信的门户，网络编程可以理解为`Socket`编程
+>
+> `Socket`从`UNIX`牵引过来翻译成了`套接字` ，主要来描述ip地址和端口，并实现不同计算机或虚拟机之间的通信
+>
+> `Socket`也可以理解插座，一台主机就像布满插座的房间，而每个插座都有一个编号，提供的电压不一样，客户根据插入不同的电压来使用不同的电器，享受不同的电压
+>
+> 一台主机运行多个服务，每个服务都建议一个`Socket`并绑定在不同端口上，不同端口对应不同服务。
+
+###### 2.2 net/dgram
+
+> `node`中对于`Socket`的实现，也就是说对于`TCP`协议、`UDP`协议分别是用`net`和`dgram`实现的，`net`是对`TCP`的封装，`dgram`是对`dgram`的封装
 
 
 
