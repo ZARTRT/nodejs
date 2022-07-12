@@ -106,10 +106,10 @@ Addons：这也是c++的部分
 >   ```
 >   Buffer.from(bufferlarraylstring) 使用堆外内存新增Buffer
 >   Buffer.from(arrayBuffer） 浅拷贝arrayBuffer，共享内存
->     
+>       
 >   Buffer.alloc(size)分配一个指定大小的Buffer，默认填0，使用UTF-8编码
 >   Buffer.allocUnsafe(size) 分配一 个未初始化的Buffer
->     
+>       
 >   流式数据会自动创建Buffer，手动创建Buffer需谨慎
 >   ```
 >
@@ -120,7 +120,7 @@ Addons：这也是c++的部分
 >   ```
 >   预分配一个内部的大小为 Buffer.poolSize(8K) 的Buffer 实例，作为快速分配的内存池
 >   如果allocUnsafe/from(array）的size小于4K，则从预分配的池子中分配
->     
+>       
 >   绕开V8回收机制，使用专用回收机制，提高性能和内存使用效率
 >   但这种玩法会导致未初始化的数据块投入使用，造成数据泄露风险
 >   ```
@@ -133,11 +133,11 @@ Addons：这也是c++的部分
 >   转换格式
 >   - 字符串：编码Buffer.from(string)，解码buf.toString()
 >   - JSON：buf.toJSON()
->     
+>       
 >   剪裁和拼接
 >   - 剪裁：Buffer.slice()表现与Array.slice()不同，返回Buffer与原buf共享内存
 >   - 拼接：buf.copy/buf.concat 返回新的Buffer
->     
+>       
 >   比较和遍历索引
 >   - 判断相等：bufl.equals(buf2)比较的是二进制的值
 >   - 索引：使用buftindex形式进行索引，for.of/indexOf/includes等Array方法也可以使用
@@ -397,7 +397,7 @@ require一个模块时，会经历路径分析、文件定位、编译执行、�
 
 node作为最流行的`Web Server`，原生到底提供了哪些能力来支持网络编程？其实写web服务无非就是启动服务、编写可调用接口、将服务数据放至数据库
 
-###### 2.1 Socket
+###### 2.1 Socket阐述
 
 > 理论来说：
 >
@@ -417,14 +417,139 @@ node作为最流行的`Web Server`，原生到底提供了哪些能力来支持�
 >
 > `Socket`也可以理解插座，一台主机就像布满插座的房间，而每个插座都有一个编号，提供的电压不一样，客户根据插入不同的电压来使用不同的电器，享受不同的电压
 >
-> 一台主机运行多个服务，每个服务都建议一个`Socket`并绑定在不同端口上，不同端口对应不同服务。
+> 一台主机运行多个服务，每个服务都建立一个`Socket`并绑定在不同端口上，不同端口对应不同服务。
 
-###### 2.2 net/dgram
+###### 2.2 net/dgram（传输层）
 
-> `node`中对于`Socket`的实现，也就是说对于`TCP`协议、`UDP`协议分别是用`net`和`dgram`实现的，`net`是对`TCP`的封装，`dgram`是对`dgram`的封装
+> `node`中对于`Socket`的实现，也就是说对于`TCP`协议、`UDP`协议分别是用`net`和`dgram`实现的，`net`是对`TCP`的封装，`dgram`是对`UDP`的封装
+>
+> `net`模块是`TCP/IP`的`Node`实现，提供了一些用于底层的网络通信的小工具
+>
+> `http.Server` 继承自`net.Server`
+>
+> http客户端与http服务端的通信均依赖于`socket` (net.Socket)
+>
+> - net. Server：TCP server， 内部通过`socke`t来实现与客户端的通信
+>
+> - net.Socket：本地`socket`的`node`版实现，它实现了全双工的`stream`
 
+###### 2.3 net.Socket
 
+> net.Socket对象是`TCP` 或` UNIX Socket` 的抽象
+>
+> net.Socket 实例实现了一个双工流接口
+>
+> API归纳
+>
+> - 连接相关 `connect`
+>
+> - 数据读写` write`
+>
+> - 数据属性 `bufferSize`
+>
+> - 地址相关 `address`
+
+###### 2.4 http/https/http2（应用层）
+
+> `HTTP模块`是`Node` 的门脸，是编写`Web Server`最常见的模块
+>
+> `Server`部分继承自`net.Server`，并对请求和响应数据进行了封装
+>
+> 也提供了 `request/get`的能力（也是从Socket封装上来的），允许高其他服务端发起HTTP请求
+>
+> Node封装了HTTPS/HTTP2的实现，可以轻松创建类HTTP服务
+>
+>  
+>
+> 小记：http是web连网的基础，封装的是http文本信息同时基于TCP/IP传输协议，并发送到网络上。http在每次请求之后都会释放链接，因此在http的链接是一种短链接。要保持客户端程序的在线状态，需要不断的对服务端发起连接请求，通常的做法是，即使不需要任何数据，客户端在一定时间内也要向服务端发起保持连接请求，服务端收到这样的请求之后并回复客户端，知道客户端还在线。如果服务端长时间没有收到客户端的请求，就认为客户端下线了。如果客户端长时间没有收到服务端的消息，就认为服务端挂了或者网络断开了
 
 ##### 3. Nodejs进程管理能力
 
 > node是怎么管理这些js执行的？
+>
+> node是单线程吗？
+>
+> node耗时计算如何避免阻塞？
+>
+> node如何实现多进程的开启和关闭？
+>
+> node可以创建线程吗？
+>
+> 怎么做的进程守护？
+
+###### 3.1 操作系统的进程与线程
+
+> 运行任务的程序叫做“进程”，一个进程只能执行一个任务
+>
+> 进程并发：以多进程形式，允许多个任务同时运行；
+>
+> 线程并发：以多线程形式，允许单个任务分成不同的部分运行;
+>
+> 操作系统提供协调机制，防止冲突，共享资源
+>
+> `JavaScript`是单线程语言，所以多个任务只能排队进行
+
+###### 3.2 多进程VS多线程
+
+> <div>
+>   <img src="README.assets/image-20220712101158163.png" alt="image-20220712101158163" width="600" />
+> </div>
+
+###### 3.3 Event Loop 概念图解
+
+> <div><img src="README.assets/image-20220712103056223.png" alt="image-20220712103056223" width="500" /></div>
+
+###### 3.4 浏览器的Event Loop 
+
+> **① 介绍：**
+>
+> - 事件循环3大块，执行栈、多线程处理、任务队列
+>
+> - 执行栈处理同步以及异步任务的回调，执行完就出栈（栈就是内存，存放js基础类型、地址引用、以及函数的调用，遵循先进后出）
+> - 任务队列分微宏两个任务，有人理解宏任务是在下一次事件循环的开头执行也没错。
+>   - 宏任务特征：有明确的异步任务需要执行和回调，需要其他异步线程支持。比如http请求需要异步的http线程
+>   - 微任务特征：没有明确的异步任务需要执行，只有回调，不需要其他异步线程支持。比如promise.then，只处理了回调而且由V8引擎来完成，并不需要其他线程来支持。从某些角度来说的话promise.then微任务并没有多线程的参与，都算不上是一个异步任务，只是书写代码的顺序修改了而已，放在了最后面。
+>
+> - js引擎线程处理js代码，而其他线程处理的是任务：定时器、http请求、事件触发，都有专门的线程处理
+>
+>  **② 浏览器的`Event Loop `执行过程如下图**
+>
+> <div><img src="README.assets/image-20220712110647066.png" alt="image-20220712110647066" width="700" /></div>
+>
+> 
+>
+> - 在浏览器中，宏任务队列有多个，微任务队列只有一个，宏任务出队是一个一个执行的，而微任务是一队一队执行的
+>
+> - 执行栈可以理解为：存储函数调用的栈结构，遵循先进后出（FILO ）的原则
+
+###### 3.5 Node.js的Event Loop 
+
+> **① 介绍：**
+>
+> - node采用V8作用js的解析引擎，而`I/O`方面采用的是自己的`LIBUV`
+>
+> - `LIBUV`是基于事件驱动跨平台的抽象层，封装了不同操作系统的底层特性，对面提供统一的`API`
+>
+> - V8引擎解析js脚本，解析后的代码调用`node API`，`LIBUV`库负责`node API`的执行，将不同的任务分配给不同的线程形成`Event Loop`，然后以异步的方式返回给V8，V8再把结果返回给用户
+> - nodejs的`Event Loop` 是在`LIBUV`里面实现的，其中`LIBUV`分6个阶段并按照顺序去反复执行，每当进入某一个阶段都会对应的从回调队列中抽取函数执行，当队列为空或执行回调函数达到系统设定值的时候，就会进入下一个阶段
+>
+> **② nodejs的`Event Loop `执行过程如下图：**
+>
+> - 应用进入V8进行解析 >> 调用node API >> 压栈到LIBUV >> 事件队列（EVENT QUEUE） >>  进入Event Loop循环 >> WORKER THREADS 执行 >> EXECUTE CALLBACK
+>
+> - <div><img src="README.assets/image-20220712120745018.png" alt="image-20220712120745018" width="700"/></div>
+>
+> **③ nodejs中的event loop（这里说的是宏任务）有6个阶段，如下图**
+>
+> - <div><img src="README.assets/image-20220712121745339.png" alt="image-20220712121745339" width="700" /></div>
+>
+> - 每当一个阶段被触发的时候就会去执行相对应的任务队列
+> - nodejs中的宏任务有4种 Timer QUEUE、I/O QUEUE、CHECK QUEUE、CLOSE QUEUE
+>
+> - nodejs中的微任务有2种 process进程中的next tick方法、promise，在nodejs种不同的微任务会放入不同的微任务队列当中，比如promise会放入promise的回调队列中，process的next tick方法会放入process的next tick回调队列中
+>
+> - 在nodejs中，宏任务队列有多个，微任务队列也有多个，宏任务跟微任务一样也是一队一队执行的
+> - 总体来说：
+>   - 第一步：执行nodejs同步代码
+>   - 第二步：执行微任务队列里面的所有内容，比如process的next tick队列、promise队列
+>   - 第三步：执行每个阶段里宏任务的所有任务，完成以后返回第二步，也就是说执行完Timer全家桶里的所有宏任务以后（在浏览器取的是一个宏任务），再去执行所有微任务（process的next tick、promise），再去执行I/O事件回调的所有宏任务，再去执行所有微任务process的next tick、promise），每个（宏任务）阶段的间隙都会去执行微任务
