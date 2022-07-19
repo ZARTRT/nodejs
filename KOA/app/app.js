@@ -74,7 +74,7 @@ class App extends Koa {
   }
 
   _connectDB() {
-    mongoose.connect('mongodb://127.0.0.1:27017/template', {
+    mongoose.connect('mongodb://admin:123456@127.0.0.1:27017/template?authSource=admin', {
       useNewUrlParser: true,
       useUnifiedTopology: true
     });
