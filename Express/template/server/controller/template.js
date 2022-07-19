@@ -29,12 +29,20 @@ router.put('/demo/:id', async (req, res) => {
     const temp = await Template.findByIdAndUpdate({_id: req.params.id}, req.body, {
         new: true
     })
-    res.$success(temp);
+    if (temp) {
+        res.$success(temp);
+    } else {
+        res.$error('更新失败', 400)
+    }
 })
 
 router.delete('/demo/:id', async (req, res) => {
-    const temp = await Template.findByIdAndRemove({_id: req.params.id})
-    res.$success(temp);
+    await Template.findByIdAndRemove({_id: req.params.id})
+    try {
+    res.$success('删除成功');
+    } catch (e) {
+        res.$error(e,400)
+    }
 })
 
 module.exports = router;
