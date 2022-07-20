@@ -1,4 +1,4 @@
-<img src="/docs/logo.png" alt="Koa middleware framework for nodejs"/>
+<img src="./docs/logo.png" alt="Koa middleware framework for nodejs"/>
 
   [![gitter][gitter-image]][gitter-url]
   [![NPM version][npm-image]][npm-url]
