@@ -11,7 +11,7 @@ const configs = {
   base: {
     env,
     name: process.env.APP_NAME || 'koa-rest-api-boilerplate',
-    host: process.env.APP_HOST || '127.0.0.1',
+    host: process.env.APP_HOST || '0.0.0.0',
     port: 7070
   },
   production: {
