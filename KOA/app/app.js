@@ -84,9 +84,9 @@ class App extends Koa {
         // eslint-disable-next-line no-console
         console.log('DB Connected!');
       })
-      .catch(err => {
+      .catch(_err => {
         // eslint-disable-next-line no-console
-        console.log(Error, err.message);
+        console.log(Error, _err.message);
       });
   }
 }
