@@ -12,7 +12,6 @@ const logger = require('./logger');
 const router = require('./routes');
 const mongoose = require('mongoose');
 
-
 class App extends Koa {
   constructor(...params) {
     super(...params);
@@ -33,10 +32,12 @@ class App extends Koa {
     this.use(errorHandler());
     this.use(apmMiddleware());
     this.use(requestId());
-    this.use(logging({
-      logger,
-      overrideSerializers: false
-    }));
+    this.use(
+      logging({
+        logger,
+        overrideSerializers: false
+      })
+    );
     this.use(
       bodyParser({
         enableTypes: ['json'],
@@ -74,10 +75,19 @@ class App extends Koa {
   }
 
   _connectDB() {
-    mongoose.connect('mongodb://admin:123456@127.0.0.1:27017/template?authSource=admin', {
-      useNewUrlParser: true,
-      useUnifiedTopology: true
-    });
+    mongoose
+      .connect('mongodb://admin:123456@127.0.0.1:27017/koatables?authSource=admin', {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+      })
+      .then(_res => {
+        // eslint-disable-next-line no-console
+        console.log('DB Connected!');
+      })
+      .catch(err => {
+        // eslint-disable-next-line no-console
+        console.log(Error, err.message);
+      });
   }
 }
 
