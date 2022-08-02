@@ -81,12 +81,10 @@ class App extends Koa {
         useUnifiedTopology: true
       })
       .then(_res => {
-        // eslint-disable-next-line no-console
-        console.log('DB Connected!');
+        logger.info('DB Connected!');
       })
       .catch(_err => {
-        // eslint-disable-next-line no-console
-        console.log(Error, _err.message);
+        logger.info(Error, _err.message);
       });
   }
 }
