@@ -516,6 +516,10 @@ node作为最流行的`Web Server`，原生到底提供了哪些能力来支持�
 >
 > - js引擎线程处理js代码，而其他线程处理的是任务：定时器、http请求、事件触发，都有专门的线程处理
 >
+> - 常见的宏任务：timer全家桶、IO的操作、UI rendering渲染等；
+> 
+> - 常见的微任务：new promise、promise.then的回调、process.nextTick、Object.observe，MutationObserver 
+> 
 >  **② 浏览器的`Event Loop `执行过程如下图**
 >
 > <div><img src="README.assets/image-20220712110647066.png" alt="image-20220712110647066" width="700" /></div>
@@ -524,7 +528,6 @@ node作为最流行的`Web Server`，原生到底提供了哪些能力来支持�
 >
 > - 在浏览器中，宏任务队列有多个，微任务队列只有一个，宏任务出队是一个一个执行的，而微任务是一队一队执行的
 >
-> - 执行栈可以理解为：存储函数调用的栈结构，遵循先进后出（FILO ）的原则
 > - 执行栈可以理解为：存储函数调用的栈结构，遵循先进后出（FILO ）的原则
 
 
