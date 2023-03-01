@@ -1,5 +1,5 @@
 ##### Nodejs原生的WebServer拓展资料
-<div><img src="stic.assets/Snipaste_2023-03-01_14-19-05.png" alt="image-20210423165136401" width="500"/></div>
+<div><img src="stic.assets/Snipaste_2023-03-01_14-19-05.png" alt="image-20210423165136401" width="400"/></div>
 
 
 | 标题                                             | 网址                                            |
